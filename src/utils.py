@@ -10,6 +10,11 @@ config.read("config/config.ini")
 
 
 def read_data():
+    """
+    Reads the data from SQS queue and returns in a JSON format
+
+    Returns: the message with JSON format
+    """
     aws_config = config["aws"]
 
     sqs = boto3.client(
@@ -33,18 +38,42 @@ def read_data():
 
 
 def pseudonymize(value, salt):
+    """
+    Accepts values to convert it into hashed value
+
+    Args:
+        value (str): user ip or device id
+        salt (str): salt to add randomness in the SHA algorithm
+
+    Returns: hashed value in string format
+    """
     value = value + salt
     hashed = hashlib.sha256(value.encode()).hexdigest()
     return hashed
 
 
 def convert_version_to_integer(version):
+    """
+    Accepts the version value in string and converts it to integer format
+
+    Args:
+        version (str): app version
+
+    Returns: version in interger format
+    """
     version_parts = version.split(".")
     version_as_int = int("".join(version_parts))
     return version_as_int
 
 
 def write_data(data):
+    """
+    Accepts the data in json format and stores in postgres database
+
+    Args:
+        data (json): user records
+
+    """
     required_fields = [
         "user_id",
         "device_type",
