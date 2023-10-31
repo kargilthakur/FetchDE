@@ -4,9 +4,13 @@ import psycopg2
 import hashlib
 from datetime import datetime
 
+
 def read_data(config):
     """
     Reads the data from SQS queue and returns in a JSON format
+
+    Args:
+        config (config): config file for aws queue
 
     Returns: the message with JSON format
     """
@@ -62,13 +66,13 @@ def convert_version_to_integer(version):
     return version_as_int
 
 
-def write_data(data,config):
+def write_data(data, config):
     """
     Accepts the data in json format and stores in postgres database
 
     Args:
         data (json): user records
-
+        config (config): config file for postgres database
     """
 
     required_fields = [
