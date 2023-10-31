@@ -1,17 +1,24 @@
 import unittest
-import sys
-sys.path.append("..") 
 import psycopg2
+from configparser import ConfigParser
 from src.utils import pseudonymize, convert_version_to_integer, write_data, read_data
-
+import os
 
 class TestYourFunctions(unittest.TestCase):
-    def __init__(self, methodName: str = "runTest") -> None:
-        super().__init__(methodName)
-        
+    def setUp(self):
+        # Set up common resources or configurations here
+        self.config = ConfigParser()
+
+        current_dir = os.path.dirname(__file__)
+        root_dir = os.path.abspath(os.path.join(current_dir, os.pardir))
+        os.chdir(root_dir)
+        config_file_path = os.path.join(root_dir, "config", "config.ini")
+        print(f"Config file path: {config_file_path}")
+        self.config.read(config_file_path)
+
     def test_read_data(self):
 
-        message = read_data()
+        message = read_data(self.config)
         self.assertIsNotNone(message)
 
     def test_pseudonymize(self):
@@ -43,8 +50,8 @@ class TestYourFunctions(unittest.TestCase):
             "app_version": "1.2.3",
         }
         
-        self.assertIsNone(write_data({}))  
-        self.assertIsNone(write_data({"user_id": "12345"}))  
+        self.assertIsNone(write_data({},self.config))  
+        self.assertIsNone(write_data({"user_id": "12345"},self.config))  
         
         test_db_conn = psycopg2.connect("postgres://postgres:postgres@localhost:5432/postgres")
         cur = test_db_conn.cursor()
@@ -57,7 +64,7 @@ class TestYourFunctions(unittest.TestCase):
         from unittest.mock import patch
         with patch("datetime.datetime") as mock_datetime:
             sample_data['create_date'] = mock_datetime.today().strftime()
-            write_data(sample_data)
+            write_data(sample_data,self.config)
         
         cur = test_db_conn.cursor()
         try:
