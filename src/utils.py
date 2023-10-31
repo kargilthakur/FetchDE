@@ -1,20 +1,16 @@
 import json
 import boto3
 import psycopg2
-from configparser import ConfigParser
 import hashlib
 from datetime import datetime
 
-config = ConfigParser()
-config.read("config/config.ini")
-
-
-def read_data():
+def read_data(config):
     """
     Reads the data from SQS queue and returns in a JSON format
 
     Returns: the message with JSON format
     """
+
     aws_config = config["aws"]
 
     sqs = boto3.client(
@@ -66,7 +62,7 @@ def convert_version_to_integer(version):
     return version_as_int
 
 
-def write_data(data):
+def write_data(data,config):
     """
     Accepts the data in json format and stores in postgres database
 
@@ -74,6 +70,7 @@ def write_data(data):
         data (json): user records
 
     """
+
     required_fields = [
         "user_id",
         "device_type",
